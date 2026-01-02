@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protótipo RAV - Busca Inteligente</title>
+    <style>
+        /* CSS Básico apenas para organização visual */
+        body { font-family: sans-serif; background-color: #f4f4f9; display: flex; justify-content: center; padding-top: 50px; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 400px; }
+        
+        input { padding: 10px; width: 65%; border: 1px solid #ccc; border-radius: 4px; }
+        button { padding: 10px 15px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; }
+        .btn-busca { background-color: #333; color: white; width: 30%; }
+        
+        /* Estilos para os estados */
+        .resultado-box { margin-top: 20px; padding: 15px; border-radius: 5px; }
+        .encontrado { background-color: #e8f5e9; border: 1px solid #c8e6c9; } /* Verde Claro */
+        .nao-encontrado { background-color: #e3f2fd; border: 1px solid #bbdefb; } /* Azul Claro */
+
+        h3 { margin-top: 0; }
+        .btn-acao { width: 100%; margin-top: 10px; padding: 12px; }
+        .btn-verde { background-color: #28a745; color: white; }
+        .btn-azul { background-color: #007bff; color: white; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>Controle de Acesso</h2>
+        <p>Digite a placa para iniciar:</p>
+        
+        <div>
+            <input type="text" id="inputPlaca" placeholder="Ex: ABC-1234" autocomplete="off">
+            <button id="btnPesquisar" class="btn-busca">Buscar</button>
+        </div>
+
+        <div id="areaResultado"></div>
+    </div>
+
+    <script>
+        // 1. O "Banco de Dados" simulado (Array de Objetos)
+        const veiculosCadastrados = [
+            { placa: 'ABC-1234', modelo: 'Fiat Uno', cor: 'Prata', dono: 'Carlos Silva' },
+            { placa: 'RAV-2025', modelo: 'Honda Civic', cor: 'Preto', dono: 'Fernanda Souza' },
+            { placa: 'XYZ-9999', modelo: 'Ford Ka', cor: 'Branco', dono: 'Empresa XPTO' },
+            { placa: 'BRA-1234', modelo: 'Fiat Uno', cor: 'Verde', dono: 'Lucas Silva dos Santos' }
+        ];
+
+        // 2. Selecionando os elementos da tela
+        const inputPlaca = document.querySelector('#inputPlaca');
+        const btnPesquisar = document.querySelector('#btnPesquisar');
+        const areaResultado = document.querySelector('#areaResultado');
+
+        // 3. Função principal que faz a mágica
+        function realizarBusca() {
+            // Pega o valor digitado e transforma em MAIÚSCULO para evitar erros
+            const placaDigitada = inputPlaca.value.toUpperCase().trim();
+
+            if(placaDigitada === "") {
+                alert("Por favor, digite uma placa!");
+                return;
+            }
+
+            // --- A BUSCA (Array.find) ---
+            // Procura dentro do array se existe algum veículo com a mesma placa
+            const veiculoEncontrado = veiculosCadastrados.find(carro => carro.placa === placaDigitada);
+
+            // 4. Lógica de Decisão (Manipulação de HTML via Template String)
+            if (veiculoEncontrado) {
+                // CENÁRIO A: Veículo JÁ EXISTE -> Mostra dados e botão de Entrada
+                areaResultado.innerHTML = `
+                    <div class="resultado-box encontrado">
+                        <h3>✅ Veículo Identificado</h3>
+                        <p><strong>Modelo:</strong> ${veiculoEncontrado.modelo} (${veiculoEncontrado.cor})</p>
+                        <p><strong>Proprietário:</strong> ${veiculoEncontrado.dono}</p>
+                        <button class="btn-acao btn-verde">Registrar Entrada ➜</button>
+                    </div>
+                `;
+            } else {
+                // CENÁRIO B: Veículo NÃO EXISTE -> Mostra formulário de cadastro
+                areaResultado.innerHTML = `
+                    <div class="resultado-box nao-encontrado">
+                        <h3>🆕 Novo Visitante</h3>
+                        <p>Placa <strong>${placaDigitada}</strong> não encontrada.</p>
+                        <input type="text" placeholder="Nome do Motorista" style="width: 93%; margin-bottom: 5px;">
+                        <input type="text" placeholder="Modelo do Carro" style="width: 93%;">
+                        <button class="btn-acao btn-azul">Cadastrar e Entrar +</button>
+                    </div>
+                `;
+            }
+        }
+
+        // 5. Adicionando o evento de clique ao botão
+        btnPesquisar.addEventListener('click', realizarBusca);
+
+        // Bônus: Permitir apertar "Enter" no teclado
+        inputPlaca.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                realizarBusca();
+            }
+        });
+
+    </script>
+</body>
+</html>
